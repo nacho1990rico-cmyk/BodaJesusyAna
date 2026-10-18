@@ -4,125 +4,193 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<title>Encuentra tus fotos</title>
+<title>Jesús &amp; Ana · 17.10.2026</title>
+<meta property="og:title" content="Jesús & Ana · Las fotos de la boda">
+<meta property="og:description" content="Hazte un selfie y encuentra todas las fotos en las que sales.">
+<meta property="og:image" content="portada.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f7f3ec; --card: #fffdf9; --ink: #2b2723; --muted: #7a7168;
-    --line: #e4dccf; --accent: #8a6f47; --accent-ink: #fff; --sel: #8a6f47;
+    --bg: #f8f4ec;        /* marfil del vestido */
+    --card: #fffdf8;
+    --ink: #2a2421;
+    --muted: #7d726b;
+    --line: #e6dccd;
+    --granate: #6e1c27;   /* tapiz */
+    --granate-2: #8c2a36;
+    --verde: #3f5a4a;     /* sillas */
+    --oro: #b0925a;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 "Jost", system-ui, sans-serif; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 "Jost", system-ui, sans-serif; }
   body.bloqueado { overflow: hidden; }
-  main { max-width: 1100px; margin: 0 auto; padding: 0 16px 120px; }
   .hidden { display: none !important; }
+  .serif { font-family: "Cormorant Garamond", Georgia, serif; }
 
-  /* Portada */
-  .portada { min-height: 88vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 0; }
-  .orla { width: 64px; height: 1px; background: var(--accent); margin: 0 auto 26px; }
-  h1 { font: 500 clamp(2.6rem, 9vw, 4.6rem)/1 "Cormorant Garamond", serif; margin: 0; letter-spacing: .01em; }
-  .sub { font: italic 500 1.25rem "Cormorant Garamond", serif; color: var(--muted); margin: 10px 0 0; }
-  .intro { max-width: 420px; margin: 34px auto 26px; }
-  .botones { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; }
-  .btn { display: inline-flex; justify-content: center; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 14px 24px; font: 500 1rem "Jost", sans-serif; cursor: pointer; background: var(--accent); color: var(--accent-ink); text-decoration: none; }
+  .btn { display: inline-flex; justify-content: center; align-items: center; gap: 10px; border: 0; border-radius: 999px; padding: 15px 26px; font: 500 1rem "Jost", sans-serif; cursor: pointer; background: var(--granate); color: #fff; text-decoration: none; transition: background .15s, transform .1s; }
+  .btn:hover { background: var(--granate-2); }
+  .btn:active { transform: scale(.98); }
   .btn.sec { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  .btn.sec:hover { background: rgba(110,28,39,.05); }
+  .btn.link { background: none; color: var(--granate); padding: 10px 6px; text-decoration: underline; text-underline-offset: 4px; }
   .btn:disabled { opacity: .5; cursor: default; }
-  .nota { color: var(--muted); font-size: .85rem; margin-top: 22px; max-width: 360px; }
-  #aviso { color: #a65b3c; margin-top: 18px; max-width: 380px; }
+  .btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
-  /* Cargando */
-  .cargando { min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 18px; }
-  .spinner { width: 34px; height: 34px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: gira 1s linear infinite; }
+  /* ---------- Portada ---------- */
+  .portada { display: grid; min-height: 100vh; min-height: 100svh; }
+  .portada .foto-p { position: relative; overflow: hidden; background: #d9cfc0; }
+  .portada .foto-p img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 48%; display: block; }
+  .portada .texto { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 36px 24px calc(40px + env(safe-area-inset-bottom)); }
+  .monograma { font: italic 400 1.05rem "Cormorant Garamond", serif; color: var(--oro); letter-spacing: .3em; text-transform: uppercase; margin-bottom: 10px; }
+  .portada h1 { font: 500 clamp(3rem, 11vw, 5.6rem)/1 "Cormorant Garamond", serif; margin: 0; color: var(--ink); }
+  .portada h1 .amp { color: var(--granate); font-style: italic; font-weight: 400; padding: 0 .08em; }
+  .fecha { margin: 14px 0 0; letter-spacing: .22em; text-transform: uppercase; font-size: .82rem; color: var(--muted); }
+  .adorno { display: flex; align-items: center; gap: 12px; margin: 26px auto; color: var(--oro); }
+  .adorno::before, .adorno::after { content: ""; width: 48px; height: 1px; background: currentColor; opacity: .7; }
+  .adorno span { width: 6px; height: 6px; transform: rotate(45deg); border: 1px solid currentColor; }
+  .mensaje { font: italic 400 1.35rem/1.45 "Cormorant Garamond", serif; max-width: 380px; margin: 0 0 30px; }
+  .botones { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 330px; }
+  .nota { color: var(--muted); font-size: .82rem; margin: 22px 0 0; max-width: 340px; }
+  #aviso { color: var(--granate); margin-top: 16px; max-width: 360px; font-weight: 500; }
+
+  /* móvil: foto arriba, texto abajo */
+  @media (max-width: 899px) {
+    .portada { grid-template-rows: 62svh auto; align-content: start; }
+    .portada .foto-p::after { content: ""; position: absolute; inset: auto 0 0 0; height: 70px; background: linear-gradient(to bottom, transparent, var(--bg)); }
+    .portada .texto { margin-top: -30px; position: relative; }
+  }
+  /* ordenador: foto a la izquierda */
+  @media (min-width: 900px) {
+    .portada { grid-template-columns: minmax(0, 1fr) minmax(440px, 1fr); height: 100vh; }
+    .portada .foto-p { height: 100vh; }
+  }
+
+  /* ---------- Contenido ---------- */
+  main { max-width: 1100px; margin: 0 auto; padding: 0 16px 130px; }
+  .cargando { min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 18px; font: italic 1.3rem "Cormorant Garamond", serif; }
+  .spinner { width: 34px; height: 34px; border: 2px solid var(--line); border-top-color: var(--granate); border-radius: 50%; animation: gira 1s linear infinite; }
   @keyframes gira { to { transform: rotate(360deg); } }
 
-  /* Resultados */
-  .cabecera { display: flex; align-items: center; gap: 16px; padding: 34px 0 22px; flex-wrap: wrap; }
-  .cabecera img { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid var(--card); box-shadow: 0 0 0 1px var(--line); }
-  .cabecera h2 { font: 600 2rem/1.1 "Cormorant Garamond", serif; margin: 0; }
-  .cabecera p { margin: 2px 0 0; color: var(--muted); }
-  .cabecera .otra { margin-left: auto; }
-  h3 { font: 600 1.4rem "Cormorant Garamond", serif; margin: 34px 0 4px; }
+  .top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+  .top .marca-t { font: 500 1.35rem "Cormorant Garamond", serif; }
+  .top .marca-t em { color: var(--granate); font-weight: 400; }
+  .top .btn { padding: 9px 16px; font-size: .9rem; }
+
+  .cabecera { display: flex; align-items: center; gap: 16px; padding: 26px 0 20px; }
+  .cabecera img { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid var(--card); box-shadow: 0 0 0 1px var(--oro); flex: none; }
+  .cabecera h2 { font: 500 2.1rem/1.05 "Cormorant Garamond", serif; margin: 0; }
+  .cabecera p { margin: 4px 0 0; color: var(--muted); font-size: .92rem; }
+  h3 { font: 500 1.55rem "Cormorant Garamond", serif; margin: 38px 0 2px; }
   .h3sub { color: var(--muted); margin: 0 0 14px; font-size: .92rem; }
-  .rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+
+  .rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 6px; }
   @media (max-width: 480px) { .rejilla { grid-template-columns: repeat(3, 1fr); gap: 3px; } }
-  .foto { position: relative; aspect-ratio: 1; overflow: hidden; background: #eae2d5; cursor: pointer; border-radius: 4px; }
-  .foto img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .2s; }
+  .foto { position: relative; aspect-ratio: 1; overflow: hidden; background: #e9e0d2; cursor: pointer; border-radius: 3px; }
+  .foto img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .2s, transform .3s; }
+  @media (hover: hover) { .foto:hover img { transform: scale(1.03); } }
   .foto.off img { opacity: .45; }
   .marca { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; background: rgba(0,0,0,.25); display: grid; place-items: center; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
-  .foto.on .marca { background: var(--sel); }
+  .foto.on .marca { background: var(--granate); }
   .marca svg { width: 14px; height: 14px; stroke: #fff; stroke-width: 3; fill: none; opacity: 0; }
   .foto.on .marca svg { opacity: 1; }
-  .vacio { text-align: center; padding: 60px 0; color: var(--muted); }
+  .vacio { text-align: center; padding: 50px 0; color: var(--muted); }
 
-  /* Barra inferior */
-  .barra { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(255,253,249,.96); backdrop-filter: blur(8px); border-top: 1px solid var(--line); padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); display: flex; gap: 10px; align-items: center; justify-content: center; z-index: 5; }
+  .barra { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(255,253,248,.96); backdrop-filter: blur(8px); border-top: 1px solid var(--line); padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); display: flex; gap: 12px; align-items: center; justify-content: center; z-index: 5; }
   .barra .txt { color: var(--muted); font-size: .9rem; }
 
-  /* Visor */
-  .visor { position: fixed; inset: 0; background: #14110f; z-index: 10; display: flex; flex-direction: column; }
+  /* ---------- Visor ---------- */
+  .visor { position: fixed; inset: 0; background: #15100f; z-index: 10; display: flex; flex-direction: column; }
   .visor .zona { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; position: relative; touch-action: pan-y; }
   .visor img { max-width: 100%; max-height: 100%; object-fit: contain; }
-  .visor .flecha { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,.12); border: 0; color: #fff; width: 44px; height: 44px; border-radius: 50%; font-size: 1.4rem; cursor: pointer; }
-  .visor .ant { left: 12px; } .visor .sig { right: 12px; }
+  .visor .flecha { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,.12); border: 0; color: #fff; width: 46px; height: 46px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; }
+  .visor .ant { left: 14px; } .visor .sig { right: 14px; }
   @media (pointer: coarse) { .visor .flecha { display: none; } }
-  .visor .pie { display: flex; gap: 10px; justify-content: center; align-items: center; padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); color: #ddd; flex-wrap: wrap; }
+  .visor .pie { display: flex; gap: 10px; justify-content: center; align-items: center; padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); flex-wrap: wrap; }
   .visor .btn.sec { color: #fff; border-color: rgba(255,255,255,.3); }
-  .visor .cerrar { position: absolute; top: calc(10px + env(safe-area-inset-top)); right: 12px; background: rgba(255,255,255,.12); color: #fff; border: 0; width: 40px; height: 40px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; z-index: 2; }
+  .visor .cerrar { position: absolute; top: calc(10px + env(safe-area-inset-top)); right: 12px; background: rgba(255,255,255,.12); color: #fff; border: 0; width: 42px; height: 42px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; z-index: 2; }
   .visor .cont { font-size: .85rem; color: #aaa; }
 
-  /* Diálogo */
-  .modal { position: fixed; inset: 0; background: rgba(20,17,15,.55); z-index: 20; display: flex; align-items: center; justify-content: center; padding: 16px; }
-  .modal > div { background: var(--card); border-radius: 16px; padding: 26px 22px; max-width: 360px; width: 100%; text-align: center; }
-  .modal h3 { margin: 0 0 8px; }
+  /* ---------- Diálogo ---------- */
+  .modal { position: fixed; inset: 0; background: rgba(21,16,15,.55); z-index: 20; display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .modal > div { background: var(--card); border-radius: 18px; padding: 28px 22px; max-width: 360px; width: 100%; text-align: center; }
+  .modal h3 { margin: 0 0 6px; }
   .modal .botones { margin: 20px auto 0; }
   .progreso { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 16px 0 6px; }
-  .progreso > div { height: 100%; width: 0; background: var(--accent); transition: width .15s; }
+  .progreso > div { height: 100%; width: 0; background: var(--granate); transition: width .15s; }
 </style>
 </head>
 <body>
-<main>
-  <!-- Portada -->
-  <section class="portada" id="vPortada">
-    <div class="orla"></div>
-    <h1 id="titulo">&nbsp;</h1>
-    <p class="sub" id="subtitulo"></p>
-    <p class="intro">Hazte un selfie y te enseñamos todas las fotos de la boda en las que sales, listas para descargar.</p>
+
+<!-- ============ Portada ============ -->
+<section class="portada" id="vPortada">
+  <div class="foto-p"><img src="portada.jpg" alt="Jesús y Ana el día de su boda"></div>
+  <div class="texto">
+    <div class="monograma">Nuestra boda</div>
+    <h1 id="titulo">Jesús <span class="amp">&amp;</span> Ana</h1>
+    <p class="fecha" id="fecha">17 de octubre de 2026</p>
+    <div class="adorno"><span></span></div>
+    <p class="mensaje" id="mensaje">Gracias por compartir con nosotros un día tan especial. Aquí tenéis las fotos para revivirlo.</p>
     <div class="botones">
-      <label class="btn" id="bSelfie">Hacerme un selfie<input type="file" accept="image/*" capture="user" hidden id="inSelfie"></label>
-      <label class="btn sec">Subir una foto mía<input type="file" accept="image/*" hidden id="inFoto"></label>
-      <a class="btn sec hidden" id="bVolver" href="#">Volver a mis fotos</a>
+      <label class="btn" id="bSelfie">
+        <svg viewBox="0 0 24 24"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        Encuentra tus fotos con un selfie
+        <input type="file" accept="image/*" capture="user" hidden id="inSelfie">
+      </label>
+      <label class="btn sec" id="bFoto">Subir una foto mía<input type="file" accept="image/*" hidden id="inFoto"></label>
+      <button class="btn sec hidden" id="bVolver">Volver a mis fotos</button>
+      <button class="btn link" id="bTodas">Ver todas las fotos</button>
     </div>
     <div id="aviso"></div>
-    <p class="nota">Tu foto se analiza en tu propio móvil y no se envía ni se guarda en ningún sitio. Funciona mejor con la cara de frente, buena luz y sin gafas de sol.</p>
-  </section>
+    <p class="nota" id="nota">Tu selfie se analiza en tu propio móvil: no se envía ni se guarda en ningún sitio. Funciona mejor de frente, con buena luz y sin gafas de sol.</p>
+  </div>
+</section>
 
-  <!-- Cargando -->
+<main>
+  <!-- ============ Cargando ============ -->
   <section class="cargando hidden" id="vCargando">
     <div class="spinner"></div>
     <div id="txtCargando">Buscándote entre las fotos…</div>
   </section>
 
-  <!-- Resultados -->
+  <!-- ============ Mis fotos ============ -->
   <section class="hidden" id="vResultados">
+    <div class="top">
+      <span class="marca-t">Jesús <em>&amp;</em> Ana</span>
+      <button class="btn sec" data-inicio>Inicio</button>
+    </div>
     <div class="cabecera">
       <img id="miCara" alt="Tu cara">
       <div>
         <h2 id="rTitulo"></h2>
         <p id="rSub"></p>
       </div>
-      <button class="btn sec otra" id="bOtra">Buscar con otra foto</button>
     </div>
     <div class="rejilla" id="gSeguras"></div>
     <div id="bloquePosibles" class="hidden">
-      <h3>Puede que también salgas aquí</h3>
+      <h3 id="hPosibles">Puede que también salgas aquí</h3>
       <p class="h3sub">No estamos seguros. Toca el círculo de las que quieras añadir a la descarga.</p>
       <div class="rejilla" id="gPosibles"></div>
     </div>
     <div class="vacio hidden" id="vacio">
       No te hemos encontrado en ninguna foto.<br>Prueba con otra foto tuya: de frente, con buena luz y sin gafas de sol.
     </div>
+  </section>
+
+  <!-- ============ Todas ============ -->
+  <section class="hidden" id="vTodas">
+    <div class="top">
+      <span class="marca-t">Jesús <em>&amp;</em> Ana</span>
+      <button class="btn sec" data-inicio>Inicio</button>
+    </div>
+    <div class="cabecera" style="padding-bottom:14px">
+      <div>
+        <h2>Todas las fotos</h2>
+        <p id="tSub"></p>
+      </div>
+    </div>
+    <div class="rejilla" id="gTodas"></div>
   </section>
 </main>
 
@@ -131,7 +199,7 @@
   <button class="btn" id="bDescargar">Descargar</button>
 </div>
 
-<!-- Visor -->
+<!-- ============ Visor ============ -->
 <div class="visor hidden" id="visor">
   <button class="cerrar" id="vCerrar" aria-label="Cerrar">✕</button>
   <div class="zona" id="vZona">
@@ -146,10 +214,10 @@
   </div>
 </div>
 
-<!-- Diálogo de descarga -->
+<!-- ============ Diálogo ============ -->
 <div class="modal hidden" id="modal">
   <div>
-    <h3 id="mTitulo">Preparando tus fotos</h3>
+    <h3 id="mTitulo"></h3>
     <p id="mTexto" class="h3sub"></p>
     <div class="progreso" id="mBarra"><div id="mProg"></div></div>
     <div class="botones" id="mBotones"></div>
@@ -160,19 +228,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const MODELOS = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1/model/';
-const UMBRAL_SEGURO = 0.50;   // distancia por debajo de la cual damos la foto por buena
+const UMBRAL_SEGURO = 0.50;   // por debajo: foto tuya segura
 const UMBRAL_POSIBLE = 0.57;  // entre ambos: "puede que salgas"
 const UMBRAL_REFUERZO = 0.42; // coincidencias muy claras que se usan como referencia extra
 const MAX_REFUERZOS = 6;
+const NOMBRE_ZIP = 'fotos-boda-jesus-ana.zip';
 
 const $ = id => document.getElementById(id);
 const esMovil = matchMedia('(pointer: coarse)').matches;
 
-let indice = null;          // datos del índice
-let carasFoto = null;       // Int32Array: foto de cada cara
-let carasDesc = null;       // Float32Array plano: 128 por cara
-let modelosListos = null;   // promesa
-let resultado = [];         // [{i, d, seguro}]
+let indice = null, carasFoto = null, carasDesc = null;
+let resultado = [];
 const seleccion = new Set();
 
 // ---------- carga ----------
@@ -191,9 +257,6 @@ async function cargarIndice() {
   carasFoto = new Int32Array(n);
   carasDesc = new Float32Array(n * 128);
   indice.caras.forEach(([f, d], k) => { carasFoto[k] = f; decodificar(d, carasDesc, k * 128); });
-  $('titulo').textContent = indice.titulo;
-  $('subtitulo').textContent = indice.subtitulo || '';
-  document.title = `${indice.titulo} · Encuentra tus fotos`;
 }
 
 async function cargarModelos() {
@@ -206,27 +269,28 @@ async function cargarModelos() {
   ]);
 }
 
-const listoIndice = cargarIndice().catch(e => {
-  console.error(e);
-  $('titulo').textContent = 'Encuentra tus fotos';
-  $('aviso').textContent = 'Todavía no hay fotos publicadas.';
-  $('bSelfie').classList.add('hidden');
-  throw e;
+const listoIndice = cargarIndice();
+listoIndice.catch(() => {
+  // aún no hay fotos publicadas
+  for (const id of ['bSelfie', 'bFoto', 'bTodas', 'nota']) $(id).classList.add('hidden');
+  $('aviso').textContent = 'Las fotos estarán disponibles muy pronto.';
 });
 // Los modelos (~12 MB) empiezan a bajar en cuanto se abre la página
-modelosListos = cargarModelos();
+const modelosListos = cargarModelos();
 modelosListos.catch(e => console.error(e));
 
 // ---------- vistas ----------
 function ver(v) {
-  for (const id of ['vPortada', 'vCargando', 'vResultados']) $(id).classList.toggle('hidden', id !== v);
+  for (const id of ['vPortada', 'vCargando', 'vResultados', 'vTodas']) $(id).classList.toggle('hidden', id !== v);
   $('barra').classList.toggle('hidden', v !== 'vResultados' || !resultado.length);
+  $('bVolver').classList.toggle('hidden', !resultado.length);
   scrollTo(0, 0);
 }
+document.querySelectorAll('[data-inicio]').forEach(b => b.onclick = () => ver('vPortada'));
+$('bVolver').onclick = () => ver('vResultados');
 
 // ---------- búsqueda ----------
 function distancias(consultas) {
-  // Para cada foto, la menor distancia entre cualquiera de sus caras y cualquiera de las consultas
   const porFoto = new Float32Array(indice.fotos.length).fill(Infinity);
   const porCara = new Float32Array(carasFoto.length);
   for (let k = 0; k < carasFoto.length; k++) {
@@ -245,9 +309,8 @@ function distancias(consultas) {
 }
 
 function buscar(desc) {
-  // 1ª pasada con el selfie
   const p1 = distancias([desc]);
-  // 2ª pasada reforzada: añadimos las caras de la boda más claramente tuyas,
+  // 2ª pasada: añadimos las caras de la boda más claramente tuyas,
   // que se parecen más al resto de fotos de la boda que un selfie
   const refuerzos = [...p1.porCara.keys()]
     .filter(k => p1.porCara[k] < UMBRAL_REFUERZO)
@@ -257,7 +320,7 @@ function buscar(desc) {
   const { porFoto } = refuerzos.length ? distancias([desc, ...refuerzos]) : p1;
   const res = [];
   porFoto.forEach((d, i) => { if (d < UMBRAL_POSIBLE) res.push({ i, d, seguro: d < UMBRAL_SEGURO }); });
-  return res; // en orden de la boda
+  return res;
 }
 
 async function procesar(file) {
@@ -285,13 +348,12 @@ async function procesar(file) {
       $('aviso').textContent = 'No vemos ninguna cara en esa foto. Prueba otra vez de frente y con buena luz.';
       return;
     }
-    // Si sale más de una persona, nos quedamos con la cara más grande
     const yo = caras.reduce((a, b) => (b.detection.box.area > a.detection.box.area ? b : a));
     $('miCara').src = recorte(c, yo.detection.box);
     resultado = buscar(yo.descriptor);
     seleccion.clear();
     resultado.forEach(r => r.seguro && seleccion.add(r.i));
-    pintar();
+    pintarResultados();
     ver('vResultados');
   } catch (e) {
     console.error(e);
@@ -310,34 +372,49 @@ function recorte(c, b) {
 
 $('inSelfie').onchange = e => { procesar(e.target.files[0]); e.target.value = ''; };
 $('inFoto').onchange = e => { procesar(e.target.files[0]); e.target.value = ''; };
-$('bOtra').onclick = () => { ver('vPortada'); $('bVolver').classList.toggle('hidden', !resultado.length); };
-$('bVolver').onclick = e => { e.preventDefault(); ver('vResultados'); };
 
-// ---------- galería ----------
+// ---------- galerías ----------
 const CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
 
-function pintar() {
+function miniatura(i, conMarca, alClicar) {
+  const d = document.createElement('div');
+  d.className = 'foto';
+  d.dataset.i = i;
+  d.innerHTML = `<img loading="lazy" src="mini/${indice.fotos[i].f}" alt="">` +
+    (conMarca ? `<span class="marca" role="checkbox" aria-label="Incluir en la descarga">${CHECK}</span>` : '');
+  d.onclick = ev => (conMarca && ev.target.closest('.marca')) ? alternar(i) : alClicar(i);
+  return d;
+}
+
+function pintarResultados() {
   const seguras = resultado.filter(r => r.seguro), posibles = resultado.filter(r => !r.seguro);
-  $('rTitulo').textContent = seguras.length === 1 ? 'Sales en 1 foto' : `Sales en ${seguras.length} fotos`;
+  $('rTitulo').textContent = seguras.length === 1 ? 'Sales en 1 foto'
+    : seguras.length ? `Sales en ${seguras.length} fotos`
+    : posibles.length ? 'No estamos seguros' : 'Vaya…';
   $('rSub').textContent = seguras.length ? 'Toca una foto para verla en grande.' : '';
-  if (!seguras.length && posibles.length) $('rTitulo').textContent = 'No estamos seguros';
+  $('hPosibles').textContent = seguras.length ? 'Puede que también salgas aquí' : 'Puede que salgas en estas';
   $('vacio').classList.toggle('hidden', resultado.length > 0);
   $('bloquePosibles').classList.toggle('hidden', !posibles.length);
-  document.querySelector('#bloquePosibles h3').textContent =
-    seguras.length ? 'Puede que también salgas aquí' : 'Puede que salgas en estas';
-  for (const [grid, lista] of [[$('gSeguras'), seguras], [$('gPosibles'), posibles]]) {
+  const lista = resultado.map(r => r.i);
+  for (const [grid, sub] of [[$('gSeguras'), seguras], [$('gPosibles'), posibles]]) {
     grid.innerHTML = '';
-    for (const r of lista) {
-      const d = document.createElement('div');
-      d.className = 'foto';
-      d.dataset.i = r.i;
-      d.innerHTML = `<img loading="lazy" src="mini/${indice.fotos[r.i].f}" alt=""><span class="marca" role="checkbox" aria-label="Incluir en la descarga">${CHECK}</span>`;
-      d.onclick = ev => ev.target.closest('.marca') ? alternar(r.i) : abrir(r.i);
-      grid.appendChild(d);
-    }
+    for (const r of sub) grid.appendChild(miniatura(r.i, true, i => abrir(i, lista, true)));
   }
   refrescarSeleccion();
 }
+
+let todasPintadas = false;
+$('bTodas').onclick = async () => {
+  try { await listoIndice; } catch { return; }
+  if (!todasPintadas) {
+    const lista = indice.fotos.map((_, i) => i);
+    const g = $('gTodas');
+    for (const i of lista) g.appendChild(miniatura(i, false, i => abrir(i, lista, false)));
+    $('tSub').textContent = `${lista.length} fotos · toca una para verla en grande y descargarla`;
+    todasPintadas = true;
+  }
+  ver('vTodas');
+};
 
 function alternar(i) {
   seleccion.has(i) ? seleccion.delete(i) : seleccion.add(i);
@@ -345,7 +422,7 @@ function alternar(i) {
 }
 
 function refrescarSeleccion() {
-  document.querySelectorAll('.foto').forEach(el => {
+  document.querySelectorAll('#vResultados .foto').forEach(el => {
     const on = seleccion.has(+el.dataset.i);
     el.classList.toggle('on', on); el.classList.toggle('off', !on);
     el.querySelector('.marca').setAttribute('aria-checked', on);
@@ -354,36 +431,37 @@ function refrescarSeleccion() {
   $('txtSel').textContent = n === 1 ? '1 foto seleccionada' : `${n} fotos seleccionadas`;
   $('bDescargar').disabled = !n;
   $('bDescargar').textContent = n ? `Descargar ${n === 1 ? 'la foto' : 'las ' + n}` : 'Descargar';
-  $('barra').classList.toggle('hidden', !resultado.length || $('vResultados').classList.contains('hidden'));
   if (!$('visor').classList.contains('hidden')) pintarVisor();
 }
 
 // ---------- visor ----------
-let actual = 0;
-const orden = () => resultado.map(r => r.i);
+let vLista = [], vPos = 0, vConSel = false;
 
-function abrir(i) { actual = orden().indexOf(i); $('visor').classList.remove('hidden'); document.body.classList.add('bloqueado'); pintarVisor(); }
+function abrir(i, lista, conSel) {
+  vLista = lista; vPos = lista.indexOf(i); vConSel = conSel;
+  $('visor').classList.remove('hidden'); document.body.classList.add('bloqueado');
+  pintarVisor();
+}
 function cerrar() { $('visor').classList.add('hidden'); document.body.classList.remove('bloqueado'); }
-function mover(n) { const o = orden(); actual = (actual + n + o.length) % o.length; pintarVisor(); }
+function mover(n) { vPos = (vPos + n + vLista.length) % vLista.length; pintarVisor(); }
 
 function pintarVisor() {
-  const o = orden(), i = o[actual], f = indice.fotos[i];
-  const img = $('vImg');
-  img.src = `mini/${f.f}`;             // se ve algo al instante…
-  const grande = new Image();          // …y se cambia por la buena al cargar
-  grande.onload = () => { if (orden()[actual] === i) img.src = grande.src; };
+  const i = vLista[vPos], f = indice.fotos[i], img = $('vImg');
+  img.src = `mini/${f.f}`;                 // se ve algo al instante…
+  const grande = new Image();              // …y se cambia por la buena al cargar
+  grande.onload = () => { if (vLista[vPos] === i) img.src = grande.src; };
   grande.src = `fotos/${f.f}`;
-  $('vCont').textContent = `${actual + 1} / ${o.length}`;
+  $('vCont').textContent = `${vPos + 1} / ${vLista.length}`;
+  $('vSel').classList.toggle('hidden', !vConSel);
   $('vSel').textContent = seleccion.has(i) ? '✓ En la descarga' : '+ Añadir a la descarga';
-  // precarga la siguiente
-  new Image().src = `fotos/${indice.fotos[o[(actual + 1) % o.length]].f}`;
+  new Image().src = `fotos/${indice.fotos[vLista[(vPos + 1) % vLista.length]].f}`;
 }
 
 $('vCerrar').onclick = cerrar;
 $('vAnt').onclick = () => mover(-1);
 $('vSig').onclick = () => mover(1);
-$('vSel').onclick = () => alternar(orden()[actual]);
-$('vBajar').onclick = () => bajarUna(orden()[actual]);
+$('vSel').onclick = () => alternar(vLista[vPos]);
+$('vBajar').onclick = () => bajarUna(vLista[vPos]);
 addEventListener('keydown', e => {
   if ($('visor').classList.contains('hidden')) return;
   if (e.key === 'Escape') cerrar();
@@ -454,8 +532,7 @@ $('bDescargar').onclick = async () => {
   let hechas = 0;
   modal('Preparando tus fotos', `0 de ${ids.length}`, [], 0);
   try {
-    // de 4 en 4 para no saturar el móvil
-    for (let k = 0; k < ids.length; k += 4) {
+    for (let k = 0; k < ids.length; k += 4) {   // de 4 en 4 para no saturar el móvil
       const lote = await Promise.all(ids.slice(k, k + 4).map(aArchivo));
       preparadas.push(...lote);
       hechas += lote.length;
@@ -466,11 +543,12 @@ $('bDescargar').onclick = async () => {
     modal('Algo ha fallado', 'No se pudieron bajar todas las fotos. Revisa la conexión e inténtalo otra vez.', [['Cerrar', cerrarModal]]);
     return;
   }
+  const compartir = puedeCompartir(preparadas);
   const opciones = [];
-  if (puedeCompartir(preparadas)) opciones.push(['Guardar en el móvil', compartirTodas]);
-  opciones.push(['Descargar en un ZIP', zipTodas, opciones.length > 0]);
+  if (compartir) opciones.push(['Guardar en el móvil', compartirTodas]);
+  opciones.push(['Descargar en un ZIP', zipTodas, compartir]);
   opciones.push(['Cancelar', cerrarModal, true]);
-  modal('Tus fotos están listas', puedeCompartir(preparadas)
+  modal('Tus fotos están listas', compartir
     ? 'Con «Guardar en el móvil» elige «Guardar imágenes» para que vayan a tu galería.'
     : `${preparadas.length} fotos en un único archivo ZIP.`, opciones);
 };
@@ -482,8 +560,7 @@ async function compartirTodas() {
   } catch (e) {
     if (e.name === 'AbortError') return;
     console.error(e);
-    // algunos móviles tienen límite de archivos al compartir: probamos con ZIP
-    zipTodas();
+    zipTodas();   // algunos móviles limitan cuántos archivos se pueden compartir
   }
 }
 
@@ -497,8 +574,7 @@ async function zipTodas() {
   modal('Creando el ZIP', '', [], 0);
   const blob = await zip.generateAsync({ type: 'blob', compression: 'STORE' },
     m => { $('mProg').style.width = m.percent + '%'; });
-  const base = (indice.titulo || 'boda').normalize('NFD').replace(/[^\w]+/g, '-').replace(/^-|-$/g, '').toLowerCase();
-  guardarBlob(blob, `fotos-${base}.zip`);
+  guardarBlob(blob, NOMBRE_ZIP);
   modal('¡Hecho!', 'Revisa tus descargas.', [['Cerrar', cerrarModal]]);
 }
 </script>
