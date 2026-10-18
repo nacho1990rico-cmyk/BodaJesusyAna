@@ -52,6 +52,14 @@
   .adorno span { width: 6px; height: 6px; transform: rotate(45deg); border: 1px solid currentColor; }
   .mensaje { font: italic 400 1.35rem/1.45 "Cormorant Garamond", serif; max-width: 380px; margin: 0 0 30px; }
   .botones { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 330px; }
+  .opciones { display: grid; gap: 8px; overflow: hidden; max-height: 0; opacity: 0; transition: max-height .3s ease, opacity .2s, margin .3s; margin: -10px 0 0; }
+  .opciones.abierto { max-height: 260px; opacity: 1; margin: 2px 0 6px; }
+  .opciones p { margin: 4px 0 2px; font-size: .85rem; color: var(--muted); }
+  .opcion { display: flex; align-items: center; gap: 14px; text-align: left; padding: 13px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); cursor: pointer; transition: border-color .15s, background .15s; }
+  .opcion:hover, .opcion:active { border-color: var(--granate); background: #fff; }
+  .opcion svg { width: 24px; height: 24px; flex: none; stroke: var(--granate); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .opcion b { display: block; font-weight: 500; }
+  .opcion small { display: block; color: var(--muted); font-size: .8rem; line-height: 1.35; }
   .nota { color: var(--muted); font-size: .82rem; margin: 22px 0 0; max-width: 340px; }
   #aviso { color: var(--granate); margin-top: 16px; max-width: 360px; font-weight: 500; }
 
@@ -133,12 +141,23 @@
     <div class="adorno"><span></span></div>
     <p class="mensaje" id="mensaje">Gracias por compartir con nosotros un día tan especial. Aquí tenéis las fotos para revivirlo.</p>
     <div class="botones">
-      <label class="btn" id="bSelfie">
-        <svg viewBox="0 0 24 24"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
-        Encuentra tus fotos con un selfie
-        <input type="file" accept="image/*" capture="user" hidden id="inSelfie">
-      </label>
-      <label class="btn sec" id="bFoto">Subir una foto mía<input type="file" accept="image/*" hidden id="inFoto"></label>
+      <button class="btn" id="bEncuentra" aria-expanded="false" aria-controls="opciones">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+        Encuéntrate en las fotos
+      </button>
+      <div class="opciones" id="opciones">
+        <p>¿Con qué foto te buscamos?</p>
+        <label class="opcion">
+          <svg viewBox="0 0 24 24"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+          <span><b>Hacerme un selfie</b><small>Se abre la cámara frontal</small></span>
+          <input type="file" accept="image/*" capture="user" hidden id="inSelfie">
+        </label>
+        <label class="opcion">
+          <svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 16l-5-5-8 8"/></svg>
+          <span><b>Elegir una foto de la galería</b><small>Una tuya, o de alguien a quien quieras buscar</small></span>
+          <input type="file" accept="image/*" hidden id="inFoto">
+        </label>
+      </div>
       <button class="btn sec hidden" id="bVolver">Volver a mis fotos</button>
       <button class="btn link" id="bTodas">Ver todas las fotos</button>
     </div>
@@ -272,7 +291,7 @@ async function cargarModelos() {
 const listoIndice = cargarIndice();
 listoIndice.catch(() => {
   // aún no hay fotos publicadas
-  for (const id of ['bSelfie', 'bFoto', 'bTodas', 'nota']) $(id).classList.add('hidden');
+  for (const id of ['bEncuentra', 'opciones', 'bTodas', 'nota']) $(id).classList.add('hidden');
   $('aviso').textContent = 'Las fotos estarán disponibles muy pronto.';
 });
 // Los modelos (~12 MB) empiezan a bajar en cuanto se abre la página
@@ -326,6 +345,8 @@ function buscar(desc) {
 async function procesar(file) {
   if (!file) return;
   $('aviso').textContent = '';
+  $('opciones').classList.remove('abierto');
+  $('bEncuentra').setAttribute('aria-expanded', false);
   ver('vCargando');
   $('txtCargando').textContent = 'Preparando el reconocimiento…';
   try { await listoIndice; } catch { ver('vPortada'); return; }
@@ -370,6 +391,13 @@ function recorte(c, b) {
   return r.toDataURL('image/jpeg', 0.8);
 }
 
+// En el móvil, el botón despliega selfie / galería. En el ordenador no hay
+// cámara frontal que abrir, así que va directo a elegir una foto.
+$('bEncuentra').onclick = () => {
+  if (!esMovil) { $('inFoto').click(); return; }
+  const abierto = $('opciones').classList.toggle('abierto');
+  $('bEncuentra').setAttribute('aria-expanded', abierto);
+};
 $('inSelfie').onchange = e => { procesar(e.target.files[0]); e.target.value = ''; };
 $('inFoto').onchange = e => { procesar(e.target.files[0]); e.target.value = ''; };
 
