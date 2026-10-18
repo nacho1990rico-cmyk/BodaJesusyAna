@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Encuentra tus fotos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f3ec; --card: #fffdf9; --ink: #2b2723; --muted: #7a7168;
+    --line: #e4dccf; --accent: #8a6f47; --accent-ink: #fff; --sel: #8a6f47;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 "Jost", system-ui, sans-serif; }
+  body.bloqueado { overflow: hidden; }
+  main { max-width: 1100px; margin: 0 auto; padding: 0 16px 120px; }
+  .hidden { display: none !important; }
+
+  /* Portada */
+  .portada { min-height: 88vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 0; }
+  .orla { width: 64px; height: 1px; background: var(--accent); margin: 0 auto 26px; }
+  h1 { font: 500 clamp(2.6rem, 9vw, 4.6rem)/1 "Cormorant Garamond", serif; margin: 0; letter-spacing: .01em; }
+  .sub { font: italic 500 1.25rem "Cormorant Garamond", serif; color: var(--muted); margin: 10px 0 0; }
+  .intro { max-width: 420px; margin: 34px auto 26px; }
+  .botones { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; }
+  .btn { display: inline-flex; justify-content: center; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 14px 24px; font: 500 1rem "Jost", sans-serif; cursor: pointer; background: var(--accent); color: var(--accent-ink); text-decoration: none; }
+  .btn.sec { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .nota { color: var(--muted); font-size: .85rem; margin-top: 22px; max-width: 360px; }
+  #aviso { color: #a65b3c; margin-top: 18px; max-width: 380px; }
+
+  /* Cargando */
+  .cargando { min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 18px; }
+  .spinner { width: 34px; height: 34px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: gira 1s linear infinite; }
+  @keyframes gira { to { transform: rotate(360deg); } }
+
+  /* Resultados */
+  .cabecera { display: flex; align-items: center; gap: 16px; padding: 34px 0 22px; flex-wrap: wrap; }
+  .cabecera img { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid var(--card); box-shadow: 0 0 0 1px var(--line); }
+  .cabecera h2 { font: 600 2rem/1.1 "Cormorant Garamond", serif; margin: 0; }
+  .cabecera p { margin: 2px 0 0; color: var(--muted); }
+  .cabecera .otra { margin-left: auto; }
+  h3 { font: 600 1.4rem "Cormorant Garamond", serif; margin: 34px 0 4px; }
+  .h3sub { color: var(--muted); margin: 0 0 14px; font-size: .92rem; }
+  .rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; }
+  @media (max-width: 480px) { .rejilla { grid-template-columns: repeat(3, 1fr); gap: 3px; } }
+  .foto { position: relative; aspect-ratio: 1; overflow: hidden; background: #eae2d5; cursor: pointer; border-radius: 4px; }
+  .foto img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity .2s; }
+  .foto.off img { opacity: .45; }
+  .marca { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; background: rgba(0,0,0,.25); display: grid; place-items: center; box-shadow: 0 1px 3px rgba(0,0,0,.3); }
+  .foto.on .marca { background: var(--sel); }
+  .marca svg { width: 14px; height: 14px; stroke: #fff; stroke-width: 3; fill: none; opacity: 0; }
+  .foto.on .marca svg { opacity: 1; }
+  .vacio { text-align: center; padding: 60px 0; color: var(--muted); }
+
+  /* Barra inferior */
+  .barra { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(255,253,249,.96); backdrop-filter: blur(8px); border-top: 1px solid var(--line); padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); display: flex; gap: 10px; align-items: center; justify-content: center; z-index: 5; }
+  .barra .txt { color: var(--muted); font-size: .9rem; }
+
+  /* Visor */
+  .visor { position: fixed; inset: 0; background: #14110f; z-index: 10; display: flex; flex-direction: column; }
+  .visor .zona { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; position: relative; touch-action: pan-y; }
+  .visor img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .visor .flecha { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,.12); border: 0; color: #fff; width: 44px; height: 44px; border-radius: 50%; font-size: 1.4rem; cursor: pointer; }
+  .visor .ant { left: 12px; } .visor .sig { right: 12px; }
+  @media (pointer: coarse) { .visor .flecha { display: none; } }
+  .visor .pie { display: flex; gap: 10px; justify-content: center; align-items: center; padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); color: #ddd; flex-wrap: wrap; }
+  .visor .btn.sec { color: #fff; border-color: rgba(255,255,255,.3); }
+  .visor .cerrar { position: absolute; top: calc(10px + env(safe-area-inset-top)); right: 12px; background: rgba(255,255,255,.12); color: #fff; border: 0; width: 40px; height: 40px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; z-index: 2; }
+  .visor .cont { font-size: .85rem; color: #aaa; }
+
+  /* Diálogo */
+  .modal { position: fixed; inset: 0; background: rgba(20,17,15,.55); z-index: 20; display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .modal > div { background: var(--card); border-radius: 16px; padding: 26px 22px; max-width: 360px; width: 100%; text-align: center; }
+  .modal h3 { margin: 0 0 8px; }
+  .modal .botones { margin: 20px auto 0; }
+  .progreso { height: 6px; background: var(--line); border-radius: 99px; overflow: hidden; margin: 16px 0 6px; }
+  .progreso > div { height: 100%; width: 0; background: var(--accent); transition: width .15s; }
+</style>
+</head>
+<body>
+<main>
+  <!-- Portada -->
+  <section class="portada" id="vPortada">
+    <div class="orla"></div>
+    <h1 id="titulo">&nbsp;</h1>
+    <p class="sub" id="subtitulo"></p>
+    <p class="intro">Hazte un selfie y te enseñamos todas las fotos de la boda en las que sales, listas para descargar.</p>
+    <div class="botones">
+      <label class="btn" id="bSelfie">Hacerme un selfie<input type="file" accept="image/*" capture="user" hidden id="inSelfie"></label>
+      <label class="btn sec">Subir una foto mía<input type="file" accept="image/*" hidden id="inFoto"></label>
+      <a class="btn sec hidden" id="bVolver" href="#">Volver a mis fotos</a>
+    </div>
+    <div id="aviso"></div>
+    <p class="nota">Tu foto se analiza en tu propio móvil y no se envía ni se guarda en ningún sitio. Funciona mejor con la cara de frente, buena luz y sin gafas de sol.</p>
+  </section>
+
+  <!-- Cargando -->
+  <section class="cargando hidden" id="vCargando">
+    <div class="spinner"></div>
+    <div id="txtCargando">Buscándote entre las fotos…</div>
+  </section>
+
+  <!-- Resultados -->
+  <section class="hidden" id="vResultados">
+    <div class="cabecera">
+      <img id="miCara" alt="Tu cara">
+      <div>
+        <h2 id="rTitulo"></h2>
+        <p id="rSub"></p>
+      </div>
+      <button class="btn sec otra" id="bOtra">Buscar con otra foto</button>
+    </div>
+    <div class="rejilla" id="gSeguras"></div>
+    <div id="bloquePosibles" class="hidden">
+      <h3>Puede que también salgas aquí</h3>
+      <p class="h3sub">No estamos seguros. Toca el círculo de las que quieras añadir a la descarga.</p>
+      <div class="rejilla" id="gPosibles"></div>
+    </div>
+    <div class="vacio hidden" id="vacio">
+      No te hemos encontrado en ninguna foto.<br>Prueba con otra foto tuya: de frente, con buena luz y sin gafas de sol.
+    </div>
+  </section>
+</main>
+
+<div class="barra hidden" id="barra">
+  <span class="txt" id="txtSel"></span>
+  <button class="btn" id="bDescargar">Descargar</button>
+</div>
+
+<!-- Visor -->
+<div class="visor hidden" id="visor">
+  <button class="cerrar" id="vCerrar" aria-label="Cerrar">✕</button>
+  <div class="zona" id="vZona">
+    <img id="vImg" alt="">
+    <button class="flecha ant" id="vAnt" aria-label="Anterior">‹</button>
+    <button class="flecha sig" id="vSig" aria-label="Siguiente">›</button>
+  </div>
+  <div class="pie">
+    <span class="cont" id="vCont"></span>
+    <button class="btn sec" id="vSel"></button>
+    <button class="btn" id="vBajar">Descargar esta</button>
+  </div>
+</div>
+
+<!-- Diálogo de descarga -->
+<div class="modal hidden" id="modal">
+  <div>
+    <h3 id="mTitulo">Preparando tus fotos</h3>
+    <p id="mTexto" class="h3sub"></p>
+    <div class="progreso" id="mBarra"><div id="mProg"></div></div>
+    <div class="botones" id="mBotones"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1/dist/face-api.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+const MODELOS = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1/model/';
+const UMBRAL_SEGURO = 0.50;   // distancia por debajo de la cual damos la foto por buena
+const UMBRAL_POSIBLE = 0.57;  // entre ambos: "puede que salgas"
+const UMBRAL_REFUERZO = 0.42; // coincidencias muy claras que se usan como referencia extra
+const MAX_REFUERZOS = 6;
+
+const $ = id => document.getElementById(id);
+const esMovil = matchMedia('(pointer: coarse)').matches;
+
+let indice = null;          // datos del índice
+let carasFoto = null;       // Int32Array: foto de cada cara
+let carasDesc = null;       // Float32Array plano: 128 por cara
+let modelosListos = null;   // promesa
+let resultado = [];         // [{i, d, seguro}]
+const seleccion = new Set();
+
+// ---------- carga ----------
+function decodificar(b64, destino, off) {
+  const s = atob(b64), b = new Uint8Array(256);
+  for (let i = 0; i < 256; i++) b[i] = s.charCodeAt(i);
+  const a = new Int16Array(b.buffer);
+  for (let i = 0; i < 128; i++) destino[off + i] = a[i] / 32767;
+}
+
+async function cargarIndice() {
+  const r = await fetch('indice.json', { cache: 'no-cache' });
+  if (!r.ok) throw new Error('Sin índice');
+  indice = await r.json();
+  const n = indice.caras.length;
+  carasFoto = new Int32Array(n);
+  carasDesc = new Float32Array(n * 128);
+  indice.caras.forEach(([f, d], k) => { carasFoto[k] = f; decodificar(d, carasDesc, k * 128); });
+  $('titulo').textContent = indice.titulo;
+  $('subtitulo').textContent = indice.subtitulo || '';
+  document.title = `${indice.titulo} · Encuentra tus fotos`;
+}
+
+async function cargarModelos() {
+  await faceapi.tf.setBackend('webgl').catch(() => faceapi.tf.setBackend('cpu'));
+  await faceapi.tf.ready();
+  await Promise.all([
+    faceapi.nets.ssdMobilenetv1.loadFromUri(MODELOS),
+    faceapi.nets.faceLandmark68Net.loadFromUri(MODELOS),
+    faceapi.nets.faceRecognitionNet.loadFromUri(MODELOS)
+  ]);
+}
+
+const listoIndice = cargarIndice().catch(e => {
+  console.error(e);
+  $('titulo').textContent = 'Encuentra tus fotos';
+  $('aviso').textContent = 'Todavía no hay fotos publicadas.';
+  $('bSelfie').classList.add('hidden');
+  throw e;
+});
+// Los modelos (~12 MB) empiezan a bajar en cuanto se abre la página
+modelosListos = cargarModelos();
+modelosListos.catch(e => console.error(e));
+
+// ---------- vistas ----------
+function ver(v) {
+  for (const id of ['vPortada', 'vCargando', 'vResultados']) $(id).classList.toggle('hidden', id !== v);
+  $('barra').classList.toggle('hidden', v !== 'vResultados' || !resultado.length);
+  scrollTo(0, 0);
+}
+
+// ---------- búsqueda ----------
+function distancias(consultas) {
+  // Para cada foto, la menor distancia entre cualquiera de sus caras y cualquiera de las consultas
+  const porFoto = new Float32Array(indice.fotos.length).fill(Infinity);
+  const porCara = new Float32Array(carasFoto.length);
+  for (let k = 0; k < carasFoto.length; k++) {
+    let mejor = Infinity;
+    const o = k * 128;
+    for (const q of consultas) {
+      let s = 0;
+      for (let i = 0; i < 128; i++) { const t = carasDesc[o + i] - q[i]; s += t * t; }
+      if (s < mejor) mejor = s;
+    }
+    mejor = Math.sqrt(mejor);
+    porCara[k] = mejor;
+    if (mejor < porFoto[carasFoto[k]]) porFoto[carasFoto[k]] = mejor;
+  }
+  return { porFoto, porCara };
+}
+
+function buscar(desc) {
+  // 1ª pasada con el selfie
+  const p1 = distancias([desc]);
+  // 2ª pasada reforzada: añadimos las caras de la boda más claramente tuyas,
+  // que se parecen más al resto de fotos de la boda que un selfie
+  const refuerzos = [...p1.porCara.keys()]
+    .filter(k => p1.porCara[k] < UMBRAL_REFUERZO)
+    .sort((a, b) => p1.porCara[a] - p1.porCara[b])
+    .slice(0, MAX_REFUERZOS)
+    .map(k => carasDesc.subarray(k * 128, k * 128 + 128));
+  const { porFoto } = refuerzos.length ? distancias([desc, ...refuerzos]) : p1;
+  const res = [];
+  porFoto.forEach((d, i) => { if (d < UMBRAL_POSIBLE) res.push({ i, d, seguro: d < UMBRAL_SEGURO }); });
+  return res; // en orden de la boda
+}
+
+async function procesar(file) {
+  if (!file) return;
+  $('aviso').textContent = '';
+  ver('vCargando');
+  $('txtCargando').textContent = 'Preparando el reconocimiento…';
+  try { await listoIndice; } catch { ver('vPortada'); return; }
+  try { await modelosListos; } catch {
+    ver('vPortada');
+    $('aviso').textContent = 'No se pudo cargar el reconocimiento facial. Revisa la conexión y recarga la página.';
+    return;
+  }
+  $('txtCargando').textContent = 'Buscándote entre las fotos…';
+  try {
+    const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    const k = Math.min(1, 1280 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    const caras = await faceapi.detectAllFaces(c, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
+      .withFaceLandmarks().withFaceDescriptors();
+    if (!caras.length) {
+      ver('vPortada');
+      $('aviso').textContent = 'No vemos ninguna cara en esa foto. Prueba otra vez de frente y con buena luz.';
+      return;
+    }
+    // Si sale más de una persona, nos quedamos con la cara más grande
+    const yo = caras.reduce((a, b) => (b.detection.box.area > a.detection.box.area ? b : a));
+    $('miCara').src = recorte(c, yo.detection.box);
+    resultado = buscar(yo.descriptor);
+    seleccion.clear();
+    resultado.forEach(r => r.seguro && seleccion.add(r.i));
+    pintar();
+    ver('vResultados');
+  } catch (e) {
+    console.error(e);
+    ver('vPortada');
+    $('aviso').textContent = 'No hemos podido leer esa foto. Prueba con otra.';
+  }
+}
+
+function recorte(c, b) {
+  const m = b.width * 0.35, x = Math.max(0, b.x - m), y = Math.max(0, b.y - m);
+  const lado = Math.min(b.width + 2 * m, c.width - x, c.height - y);
+  const r = document.createElement('canvas'); r.width = r.height = 160;
+  r.getContext('2d').drawImage(c, x, y, lado, lado, 0, 0, 160, 160);
+  return r.toDataURL('image/jpeg', 0.8);
+}
+
+$('inSelfie').onchange = e => { procesar(e.target.files[0]); e.target.value = ''; };
+$('inFoto').onchange = e => { procesar(e.target.files[0]); e.target.value = ''; };
+$('bOtra').onclick = () => { ver('vPortada'); $('bVolver').classList.toggle('hidden', !resultado.length); };
+$('bVolver').onclick = e => { e.preventDefault(); ver('vResultados'); };
+
+// ---------- galería ----------
+const CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+function pintar() {
+  const seguras = resultado.filter(r => r.seguro), posibles = resultado.filter(r => !r.seguro);
+  $('rTitulo').textContent = seguras.length === 1 ? 'Sales en 1 foto' : `Sales en ${seguras.length} fotos`;
+  $('rSub').textContent = seguras.length ? 'Toca una foto para verla en grande.' : '';
+  if (!seguras.length && posibles.length) $('rTitulo').textContent = 'No estamos seguros';
+  $('vacio').classList.toggle('hidden', resultado.length > 0);
+  $('bloquePosibles').classList.toggle('hidden', !posibles.length);
+  document.querySelector('#bloquePosibles h3').textContent =
+    seguras.length ? 'Puede que también salgas aquí' : 'Puede que salgas en estas';
+  for (const [grid, lista] of [[$('gSeguras'), seguras], [$('gPosibles'), posibles]]) {
+    grid.innerHTML = '';
+    for (const r of lista) {
+      const d = document.createElement('div');
+      d.className = 'foto';
+      d.dataset.i = r.i;
+      d.innerHTML = `<img loading="lazy" src="mini/${indice.fotos[r.i].f}" alt=""><span class="marca" role="checkbox" aria-label="Incluir en la descarga">${CHECK}</span>`;
+      d.onclick = ev => ev.target.closest('.marca') ? alternar(r.i) : abrir(r.i);
+      grid.appendChild(d);
+    }
+  }
+  refrescarSeleccion();
+}
+
+function alternar(i) {
+  seleccion.has(i) ? seleccion.delete(i) : seleccion.add(i);
+  refrescarSeleccion();
+}
+
+function refrescarSeleccion() {
+  document.querySelectorAll('.foto').forEach(el => {
+    const on = seleccion.has(+el.dataset.i);
+    el.classList.toggle('on', on); el.classList.toggle('off', !on);
+    el.querySelector('.marca').setAttribute('aria-checked', on);
+  });
+  const n = seleccion.size;
+  $('txtSel').textContent = n === 1 ? '1 foto seleccionada' : `${n} fotos seleccionadas`;
+  $('bDescargar').disabled = !n;
+  $('bDescargar').textContent = n ? `Descargar ${n === 1 ? 'la foto' : 'las ' + n}` : 'Descargar';
+  $('barra').classList.toggle('hidden', !resultado.length || $('vResultados').classList.contains('hidden'));
+  if (!$('visor').classList.contains('hidden')) pintarVisor();
+}
+
+// ---------- visor ----------
+let actual = 0;
+const orden = () => resultado.map(r => r.i);
+
+function abrir(i) { actual = orden().indexOf(i); $('visor').classList.remove('hidden'); document.body.classList.add('bloqueado'); pintarVisor(); }
+function cerrar() { $('visor').classList.add('hidden'); document.body.classList.remove('bloqueado'); }
+function mover(n) { const o = orden(); actual = (actual + n + o.length) % o.length; pintarVisor(); }
+
+function pintarVisor() {
+  const o = orden(), i = o[actual], f = indice.fotos[i];
+  const img = $('vImg');
+  img.src = `mini/${f.f}`;             // se ve algo al instante…
+  const grande = new Image();          // …y se cambia por la buena al cargar
+  grande.onload = () => { if (orden()[actual] === i) img.src = grande.src; };
+  grande.src = `fotos/${f.f}`;
+  $('vCont').textContent = `${actual + 1} / ${o.length}`;
+  $('vSel').textContent = seleccion.has(i) ? '✓ En la descarga' : '+ Añadir a la descarga';
+  // precarga la siguiente
+  new Image().src = `fotos/${indice.fotos[o[(actual + 1) % o.length]].f}`;
+}
+
+$('vCerrar').onclick = cerrar;
+$('vAnt').onclick = () => mover(-1);
+$('vSig').onclick = () => mover(1);
+$('vSel').onclick = () => alternar(orden()[actual]);
+$('vBajar').onclick = () => bajarUna(orden()[actual]);
+addEventListener('keydown', e => {
+  if ($('visor').classList.contains('hidden')) return;
+  if (e.key === 'Escape') cerrar();
+  if (e.key === 'ArrowLeft') mover(-1);
+  if (e.key === 'ArrowRight') mover(1);
+});
+let x0 = null;
+$('vZona').addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+$('vZona').addEventListener('touchend', e => {
+  if (x0 === null) return;
+  const dx = e.changedTouches[0].clientX - x0; x0 = null;
+  if (Math.abs(dx) > 50) mover(dx < 0 ? 1 : -1);
+});
+
+// ---------- descargas ----------
+const nombre = i => indice.fotos[i].n.replace(/\.[^.]+$/, '') + '.jpg';
+
+async function aArchivo(i) {
+  const r = await fetch(`fotos/${indice.fotos[i].f}`);
+  if (!r.ok) throw new Error('No se pudo bajar ' + indice.fotos[i].f);
+  return new File([await r.blob()], nombre(i), { type: 'image/jpeg' });
+}
+
+function puedeCompartir(files) {
+  try { return esMovil && navigator.canShare && navigator.canShare({ files }); } catch { return false; }
+}
+
+function guardarBlob(blob, nom) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = nom;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+}
+
+async function bajarUna(i) {
+  const btn = $('vBajar'); btn.disabled = true;
+  try {
+    const f = await aArchivo(i);
+    if (puedeCompartir([f])) {
+      try { await navigator.share({ files: [f] }); }
+      catch (e) { if (e.name !== 'AbortError') guardarBlob(f, f.name); }
+    } else guardarBlob(f, f.name);
+  } catch (e) { console.error(e); alert('No se pudo descargar la foto. Inténtalo de nuevo.'); }
+  btn.disabled = false;
+}
+
+function modal(titulo, texto, botones = [], progreso = null) {
+  $('modal').classList.remove('hidden');
+  $('mTitulo').textContent = titulo;
+  $('mTexto').textContent = texto;
+  $('mBarra').classList.toggle('hidden', progreso === null);
+  if (progreso !== null) $('mProg').style.width = (progreso * 100) + '%';
+  const cont = $('mBotones'); cont.innerHTML = '';
+  for (const [txt, fn, sec] of botones) {
+    const b = document.createElement('button');
+    b.className = 'btn' + (sec ? ' sec' : ''); b.textContent = txt; b.onclick = fn;
+    cont.appendChild(b);
+  }
+}
+const cerrarModal = () => $('modal').classList.add('hidden');
+
+let preparadas = [];
+
+$('bDescargar').onclick = async () => {
+  const ids = resultado.map(r => r.i).filter(i => seleccion.has(i));
+  if (!ids.length) return;
+  preparadas = [];
+  let hechas = 0;
+  modal('Preparando tus fotos', `0 de ${ids.length}`, [], 0);
+  try {
+    // de 4 en 4 para no saturar el móvil
+    for (let k = 0; k < ids.length; k += 4) {
+      const lote = await Promise.all(ids.slice(k, k + 4).map(aArchivo));
+      preparadas.push(...lote);
+      hechas += lote.length;
+      modal('Preparando tus fotos', `${hechas} de ${ids.length}`, [], hechas / ids.length);
+    }
+  } catch (e) {
+    console.error(e);
+    modal('Algo ha fallado', 'No se pudieron bajar todas las fotos. Revisa la conexión e inténtalo otra vez.', [['Cerrar', cerrarModal]]);
+    return;
+  }
+  const opciones = [];
+  if (puedeCompartir(preparadas)) opciones.push(['Guardar en el móvil', compartirTodas]);
+  opciones.push(['Descargar en un ZIP', zipTodas, opciones.length > 0]);
+  opciones.push(['Cancelar', cerrarModal, true]);
+  modal('Tus fotos están listas', puedeCompartir(preparadas)
+    ? 'Con «Guardar en el móvil» elige «Guardar imágenes» para que vayan a tu galería.'
+    : `${preparadas.length} fotos en un único archivo ZIP.`, opciones);
+};
+
+async function compartirTodas() {
+  try {
+    await navigator.share({ files: preparadas });
+    cerrarModal();
+  } catch (e) {
+    if (e.name === 'AbortError') return;
+    console.error(e);
+    // algunos móviles tienen límite de archivos al compartir: probamos con ZIP
+    zipTodas();
+  }
+}
+
+async function zipTodas() {
+  const zip = new JSZip(), usados = new Set();
+  for (const f of preparadas) {
+    let n = f.name, c = 2;
+    while (usados.has(n)) n = f.name.replace(/\.jpg$/, `-${c++}.jpg`);
+    usados.add(n); zip.file(n, f);
+  }
+  modal('Creando el ZIP', '', [], 0);
+  const blob = await zip.generateAsync({ type: 'blob', compression: 'STORE' },
+    m => { $('mProg').style.width = m.percent + '%'; });
+  const base = (indice.titulo || 'boda').normalize('NFD').replace(/[^\w]+/g, '-').replace(/^-|-$/g, '').toLowerCase();
+  guardarBlob(blob, `fotos-${base}.zip`);
+  modal('¡Hecho!', 'Revisa tus descargas.', [['Cerrar', cerrarModal]]);
+}
+</script>
+</body>
+</html>
