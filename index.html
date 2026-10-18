@@ -111,7 +111,14 @@
   /* ---------- Visor ---------- */
   .visor { position: fixed; inset: 0; background: #15100f; z-index: 10; display: flex; flex-direction: column; }
   .visor .zona { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; position: relative; touch-action: pan-y; }
-  .visor img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .visor img { max-width: 100%; max-height: 100%; object-fit: contain; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-user-drag: none; }
+  .visor .varita.on { background: linear-gradient(135deg, #f3dc9c, #c9a45c); color: #2a2421; border-color: transparent; }
+  .visor .varita:disabled { opacity: .7; }
+  .visor .varita.trabajando svg { animation: brillo .8s ease-in-out infinite alternate; }
+  @keyframes brillo { from { opacity: .35; transform: rotate(-8deg); } to { opacity: 1; transform: rotate(8deg); } }
+  .visor .etiqueta { position: absolute; top: calc(14px + env(safe-area-inset-top)); left: 14px; background: rgba(0,0,0,.55); color: #fff; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; padding: 5px 10px; border-radius: 99px; pointer-events: none; }
+  .visor .pista { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,.55); color: #eee; font-size: .78rem; padding: 5px 12px; border-radius: 99px; pointer-events: none; white-space: nowrap; transition: opacity .6s; }
+  .visor .pista.fuera { opacity: 0; }
   .visor .flecha { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,.12); border: 0; color: #fff; width: 46px; height: 46px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; }
   .visor .ant { left: 14px; } .visor .sig { right: 14px; }
   @media (pointer: coarse) { .visor .flecha { display: none; } }
@@ -222,12 +229,18 @@
 <div class="visor hidden" id="visor">
   <button class="cerrar" id="vCerrar" aria-label="Cerrar">✕</button>
   <div class="zona" id="vZona">
-    <img id="vImg" alt="">
+    <img id="vImg" alt="" draggable="false">
+    <span class="etiqueta hidden" id="vEtiqueta">Original</span>
+    <span class="pista hidden" id="vPista">Mantén pulsada la foto para ver el original</span>
     <button class="flecha ant" id="vAnt" aria-label="Anterior">‹</button>
     <button class="flecha sig" id="vSig" aria-label="Siguiente">›</button>
   </div>
   <div class="pie">
     <span class="cont" id="vCont"></span>
+    <button class="btn sec varita" id="vMejorar" aria-pressed="false">
+      <svg viewBox="0 0 24 24"><path d="M4 20L15 9"/><path d="M13.5 7.5l3 3"/><path d="M18 3v3M16.5 4.5h3M20 10v2M19 11h2M9 3v2M8 4h2"/></svg>
+      <span>Mejorar</span>
+    </button>
     <button class="btn sec" id="vSel"></button>
     <button class="btn" id="vBajar">Descargar esta</button>
   </div>
@@ -475,15 +488,147 @@ function mover(n) { vPos = (vPos + n + vLista.length) % vLista.length; pintarVis
 
 function pintarVisor() {
   const i = vLista[vPos], f = indice.fotos[i], img = $('vImg');
+  viendoOriginal = false; $('vEtiqueta').classList.add('hidden');
   img.src = `mini/${f.f}`;                 // se ve algo al instante…
-  const grande = new Image();              // …y se cambia por la buena al cargar
-  grande.onload = () => { if (vLista[vPos] === i) img.src = grande.src; };
-  grande.src = `fotos/${f.f}`;
+  if (mejoradas.has(i)) {                  // …y luego la buena (mejorada o no)
+    urlMejorada(i).then(u => { if (vLista[vPos] === i && mejoradas.has(i)) img.src = u; }).catch(() => {});
+  } else {
+    const grande = new Image();
+    grande.onload = () => { if (vLista[vPos] === i && !mejoradas.has(i)) img.src = grande.src; };
+    grande.src = `fotos/${f.f}`;
+  }
   $('vCont').textContent = `${vPos + 1} / ${vLista.length}`;
   $('vSel').classList.toggle('hidden', !vConSel);
   $('vSel').textContent = seleccion.has(i) ? '✓ En la descarga' : '+ Añadir a la descarga';
+  pintarVarita();
   new Image().src = `fotos/${indice.fotos[vLista[(vPos + 1) % vLista.length]].f}`;
 }
+
+// ---------- varita mágica ----------
+// Ajuste automático tipo "mejora" del iPhone: balance de blancos, niveles,
+// exposición de los tonos medios, un poco de contraste y de intensidad.
+const mejoradas = new Set();
+const blobsMejorados = new Map();   // i -> Promise<Blob>
+const urlsMejoradas = new Map();    // i -> objectURL
+let pistaVista = false;
+
+function cargarImagen(src) {
+  return new Promise((ok, mal) => { const im = new Image(); im.onload = () => ok(im); im.onerror = mal; im.src = src; });
+}
+
+function mejorarPixeles(d) {
+  const n = d.length / 4, paso = Math.max(1, Math.floor(n / 250000)) * 4;
+  const hist = new Uint32Array(256);
+  let sr = 0, sg = 0, sb = 0, cm = 0, total = 0;
+  for (let p = 0; p < d.length; p += paso) {
+    const r = d[p], g = d[p + 1], b = d[p + 2];
+    const y = (0.299 * r + 0.587 * g + 0.114 * b) | 0;
+    hist[y]++; total++;
+    if (y > 40 && y < 215) { sr += r; sg += g; sb += b; cm++; }
+  }
+  // balance de blancos suave (mundo gris en los tonos medios)
+  const mr = sr / cm || 128, mg = sg / cm || 128, mb = sb / cm || 128, gris = (mr + mg + mb) / 3;
+  const ganancia = m => 1 + (Math.min(1.07, Math.max(0.93, gris / m)) - 1) * 0.6;
+  const gan = [ganancia(mr), ganancia(mg), ganancia(mb)];
+  // niveles: puntos negro y blanco con un 0,5 % de margen, sin pasarse
+  const pct = q => { let acc = 0; const lim = total * q; for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc >= lim) return v; } return 255; };
+  const lo = Math.min(pct(0.005), 40), hi = Math.max(pct(0.995), 165);
+  // exposición: llevar la mediana hacia tonos medios
+  const medN = Math.min(0.95, Math.max(0.05, (pct(0.5) - lo) / (hi - lo)));
+  let gamma = Math.log(0.46) / Math.log(medN);
+  gamma = 1 + (Math.min(1.25, Math.max(0.65, gamma)) - 1) * 0.75;
+  // tabla de tonos por canal
+  const luts = gan.map(gc => {
+    const t = new Uint8ClampedArray(256);
+    for (let v = 0; v < 256; v++) {
+      let x = (v * gc - lo) / (hi - lo);
+      x = Math.min(1, Math.max(0, x));
+      x = Math.pow(x, gamma);
+      const s = x * x * (3 - 2 * x);      // curva en S suave = algo más de contraste
+      x = x + (s - x) * 0.22;
+      t[v] = Math.round(x * 255);
+    }
+    return t;
+  });
+  // aplicar + intensidad (satura más lo apagado que lo ya saturado: respeta las pieles)
+  const [lr, lg, lb] = luts;
+  for (let p = 0; p < d.length; p += 4) {
+    let r = lr[d[p]], g = lg[d[p + 1]], b = lb[d[p + 2]];
+    const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+    const sat = (mx - mn) / 255, k = 1 + 0.25 * (1 - sat) * (1 - sat);
+    const m = (r + g + b) / 3;
+    d[p] = m + (r - m) * k; d[p + 1] = m + (g - m) * k; d[p + 2] = m + (b - m) * k;
+  }
+}
+
+function blobMejorado(i) {
+  if (!blobsMejorados.has(i)) {
+    const p = (async () => {
+      const im = await cargarImagen(`fotos/${indice.fotos[i].f}`);
+      const c = document.createElement('canvas');
+      c.width = im.naturalWidth; c.height = im.naturalHeight;
+      const ctx = c.getContext('2d', { willReadFrequently: true });
+      ctx.drawImage(im, 0, 0);
+      const datos = ctx.getImageData(0, 0, c.width, c.height);
+      mejorarPixeles(datos.data);
+      ctx.putImageData(datos, 0, 0);
+      return await new Promise(ok => c.toBlob(ok, 'image/jpeg', 0.92));
+    })();
+    p.catch(() => blobsMejorados.delete(i));
+    blobsMejorados.set(i, p);
+  }
+  return blobsMejorados.get(i);
+}
+
+async function urlMejorada(i) {
+  if (!urlsMejoradas.has(i)) urlsMejoradas.set(i, URL.createObjectURL(await blobMejorado(i)));
+  return urlsMejoradas.get(i);
+}
+
+function pintarVarita() {
+  const i = vLista[vPos], on = mejoradas.has(i), b = $('vMejorar');
+  b.classList.toggle('on', on);
+  b.setAttribute('aria-pressed', on);
+  b.querySelector('span').textContent = on ? 'Mejorada' : 'Mejorar';
+}
+
+$('vMejorar').onclick = async () => {
+  const i = vLista[vPos], b = $('vMejorar');
+  if (mejoradas.has(i)) { mejoradas.delete(i); pintarVisor(); return; }
+  b.disabled = true; b.classList.add('trabajando');
+  b.querySelector('span').textContent = 'Mejorando…';
+  try {
+    const u = await urlMejorada(i);
+    mejoradas.add(i);
+    if (vLista[vPos] === i) $('vImg').src = u;
+    if (!pistaVista) {   // la primera vez, explicamos cómo comparar
+      pistaVista = true;
+      const pista = $('vPista');
+      pista.classList.remove('hidden', 'fuera');
+      setTimeout(() => pista.classList.add('fuera'), 2800);
+      setTimeout(() => pista.classList.add('hidden'), 3500);
+    }
+  } catch (e) {
+    console.error(e);
+    alert('No se pudo mejorar esta foto.');
+  }
+  b.disabled = false; b.classList.remove('trabajando');
+  pintarVarita();
+};
+
+// Mantener pulsada la foto mejorada = ver el original
+let viendoOriginal = false;
+function verOriginal(si) {
+  const i = vLista[vPos];
+  if (!mejoradas.has(i) || si === viendoOriginal) return;
+  viendoOriginal = si;
+  $('vEtiqueta').classList.toggle('hidden', !si);
+  if (si) $('vImg').src = `fotos/${indice.fotos[i].f}`;
+  else urlMejorada(i).then(u => { if (vLista[vPos] === i && !viendoOriginal) $('vImg').src = u; });
+}
+$('vImg').addEventListener('pointerdown', () => verOriginal(true));
+for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) $('vImg').addEventListener(ev, () => verOriginal(false));
+$('vImg').addEventListener('contextmenu', e => e.preventDefault());
 
 $('vCerrar').onclick = cerrar;
 $('vAnt').onclick = () => mover(-1);
@@ -508,6 +653,9 @@ $('vZona').addEventListener('touchend', e => {
 const nombre = i => indice.fotos[i].n.replace(/\.[^.]+$/, '') + '.jpg';
 
 async function aArchivo(i) {
+  if (mejoradas.has(i)) {   // las que el invitado ha mejorado se descargan mejoradas
+    return new File([await blobMejorado(i)], nombre(i).replace(/\.jpg$/, '-mejorada.jpg'), { type: 'image/jpeg' });
+  }
   const r = await fetch(`fotos/${indice.fotos[i].f}`);
   if (!r.ok) throw new Error('No se pudo bajar ' + indice.fotos[i].f);
   return new File([await r.blob()], nombre(i), { type: 'image/jpeg' });
